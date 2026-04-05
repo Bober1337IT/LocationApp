@@ -4,7 +4,10 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -26,6 +29,8 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
 
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
+
+    var isFirstUpdate by remember { mutableStateOf(true) }
 
     remember {
         MapLibre.getInstance(context)
@@ -54,33 +59,38 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
         }
     }
     AndroidView(
-        factory = { mapView },
-        modifier = Modifier.fillMaxSize()
-    ) { mv ->
-        mv.getMapAsync { map ->
-            map.setStyle("https://basemaps.cartocdn.com/gl/positron-gl-style/style.json") { style ->
+        factory = {
+            mapView.apply {
+                getMapAsync { map ->
+                    map.setStyle("https://basemaps.cartocdn.com/gl/positron-gl-style/style.json") { style ->
+                        val locationComponent = map.locationComponent
 
-                val locationComponent = map.locationComponent
+                        val activationOptions = LocationComponentActivationOptions
+                            .builder(context, style)
+                            .useDefaultLocationEngine(true)
+                            .build()
 
-                val activationOptions = LocationComponentActivationOptions
-                    .builder(context, style)
-                    .useDefaultLocationEngine(true)
-                    .build()
-
-                locationComponent.activateLocationComponent(activationOptions)
-
-                locationComponent.isLocationComponentEnabled = true
-
-                locationComponent.renderMode = RenderMode.COMPASS
-
-                var newPoint: Marker? = null
-
-                if (latitude != null && longitude != null) {
+                        locationComponent.activateLocationComponent(activationOptions)
+                        locationComponent.isLocationComponentEnabled = true
+                        locationComponent.renderMode = RenderMode.COMPASS
+                    }
+                }
+            }
+        },
+        modifier = Modifier.fillMaxSize(),
+        update = { mv ->
+            var newPoint: Marker? = null
+            if (latitude != null && longitude != null) {
+                mv.getMapAsync { map ->
                     val userLatLng = LatLng(latitude, longitude)
 
-                    map.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(userLatLng, 13.0)
-                    )
+                    if (isFirstUpdate) {
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13.0))
+                        isFirstUpdate = false
+                    } else {
+                        val currentZoom = map.cameraPosition.zoom
+                        map.easeCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, currentZoom))
+                    }
 
                     map.addOnMapClickListener { point ->
                         if (newPoint != null) {
@@ -95,5 +105,6 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
                 }
             }
         }
-    }
+    )
 }
+
