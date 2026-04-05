@@ -11,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.maplibre.android.MapLibre
+import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.maps.MapView
@@ -61,7 +62,20 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
                         zoom = 13.0
                     )
                 )
+                map.addMarker(
+                    MarkerOptions()
+                        .position(LatLng(latitude, longitude))
+                )
+                map.addOnMapClickListener { point ->
+                    val latLng = LatLng(point.latitude, point.longitude)
 
+                    map.addMarker(
+                        MarkerOptions()
+                            .position(latLng)
+                    )
+
+                    true
+                }
             }
         }
     }
