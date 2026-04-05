@@ -1,7 +1,6 @@
 package com.bober.locationapp.location_screen
 
 import android.Manifest
-import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -134,7 +133,7 @@ fun LocationScreen(
                 }
 
                 state.location != null -> {
-                    MapScreen(state.location.latitude, state.location.longitude)
+                    MapScreen(state.location)
                 }
             }
         }

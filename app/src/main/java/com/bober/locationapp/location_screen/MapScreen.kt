@@ -1,6 +1,7 @@
 package com.bober.locationapp.location_screen
 
 import android.annotation.SuppressLint
+import android.location.Location
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -34,7 +35,7 @@ import org.maplibre.android.maps.MapView
 
 @SuppressLint("MissingPermission")
 @Composable
-fun MapScreen(latitude: Double?, longitude: Double?) {
+fun MapScreen(location: Location?) {
 
     val context = LocalContext.current
     val lifecycle = LocalLifecycleOwner.current.lifecycle
@@ -97,7 +98,7 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
 
                             val activationOptions = LocationComponentActivationOptions
                                 .builder(context, style)
-                                .useDefaultLocationEngine(true)
+                                .useDefaultLocationEngine(false)
                                 .build()
 
                             locationComponent.activateLocationComponent(activationOptions)
@@ -128,9 +129,13 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
             },
             modifier = Modifier.fillMaxSize(),
             update = { mv ->
-                if (latitude != null && longitude != null) {
+                location?.let { currentLocation ->
                     mv.getMapAsync { map ->
-                        val userLatLng = LatLng(latitude, longitude)
+                        val userLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
+
+                        if (map.locationComponent.isLocationComponentActivated) {
+                            map.locationComponent.forceLocationUpdate(currentLocation)
+                        }
 
                         if (isFirstUpdate) {
                             map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13.0))
