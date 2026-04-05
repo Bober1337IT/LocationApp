@@ -34,7 +34,7 @@ class LocationViewModel @Inject constructor(
             } else {
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = "Could not retrieve location. Check GPS/Permissions."
+                    error = "Could not retrieve location. Check GPS or Network."
                 )
             }
         }

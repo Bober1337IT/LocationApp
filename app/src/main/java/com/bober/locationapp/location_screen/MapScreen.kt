@@ -6,11 +6,13 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.data.position
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.maplibre.android.MapLibre
+import org.maplibre.android.annotations.Marker
 import org.maplibre.android.annotations.MarkerOptions
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
@@ -55,6 +57,8 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
         mv.getMapAsync { map ->
             map.setStyle("https://basemaps.cartocdn.com/gl/positron-gl-style/style.json")
 
+            var newPoint: Marker? = null
+
             if (latitude != null && longitude != null) {
                 map.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(
@@ -67,13 +71,15 @@ fun MapScreen(latitude: Double?, longitude: Double?) {
                         .position(LatLng(latitude, longitude))
                 )
                 map.addOnMapClickListener { point ->
-                    val latLng = LatLng(point.latitude, point.longitude)
 
-                    map.addMarker(
-                        MarkerOptions()
-                            .position(latLng)
-                    )
-
+                    if (newPoint != null) {
+                        newPoint?.position = point
+                    } else {
+                        newPoint = map.addMarker(
+                            MarkerOptions()
+                                .position(point)
+                        )
+                    }
                     true
                 }
             }

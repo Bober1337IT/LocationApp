@@ -69,10 +69,6 @@ fun LocationScreen(
                     Text(text = "Fetching location and city...")
                 }
 
-                state.error != null -> {
-                    Text(text = "Error: ${state.error}", color = Color.Red)
-                }
-
                 state.cityName != null -> {
                     Text(text = "Your City:", style = MaterialTheme.typography.headlineSmall)
                     Text(text = state.cityName, style = MaterialTheme.typography.headlineLarge)
@@ -99,9 +95,14 @@ fun LocationScreen(
                 }
 
                 state.error != null -> {
-                    Text(text = "Error: ${state.error}", color = Color.Red)
-                    Button(onClick = { viewModel.loadLocation() }) {
-                        Text("Retry")
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(text = "Error: ${state.error}", color = Color.Red)
+                        Button(onClick = { viewModel.loadLocation() }) {
+                            Text("Retry")
+                        }
                     }
                 }
 
