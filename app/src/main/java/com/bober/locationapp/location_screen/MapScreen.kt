@@ -3,6 +3,7 @@ package com.bober.locationapp.location_screen
 import android.annotation.SuppressLint
 import android.location.Location
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
@@ -25,6 +26,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.maplibre.android.MapLibre
 import org.maplibre.android.annotations.Marker
 import org.maplibre.android.annotations.MarkerOptions
+import org.maplibre.android.camera.CameraPosition
 import org.maplibre.android.camera.CameraUpdateFactory
 import org.maplibre.android.geometry.LatLng
 import org.maplibre.android.gestures.MoveGestureDetector
@@ -127,7 +129,6 @@ fun MapScreen(location: Location?) {
                     }
                 }
             },
-            modifier = Modifier.fillMaxSize(),
             update = { mv ->
                 location?.let { currentLocation ->
                     mv.getMapAsync { map ->
@@ -138,17 +139,26 @@ fun MapScreen(location: Location?) {
                         }
 
                         if (isFirstUpdate) {
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 13.0))
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 15.0))
                             isFirstUpdate = false
-                        } else if(fixedCamera) {
-                            val currentZoom = map.cameraPosition.zoom
-                            map.easeCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, currentZoom))
+                        } else if (fixedCamera) {
+                            val cameraPosition = CameraPosition.Builder()
+                                .target(userLatLng)
+                                .zoom(15.0)
+                                .bearing(0.0)
+                                .build()
+
+                            map.animateCamera(
+                                CameraUpdateFactory.newCameraPosition(cameraPosition),
+                                1000
+                            )
                         }
-
-
                     }
                 }
-            }
+            },
+            modifier = Modifier
+                .padding(paddingValues)
+                .fillMaxSize()
         )
     }
 }
