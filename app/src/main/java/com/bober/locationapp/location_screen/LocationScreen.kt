@@ -71,9 +71,6 @@ fun LocationScreen(
 
                 state.error != null -> {
                     Text(text = "Error: ${state.error}", color = Color.Red)
-                    Button(onClick = { viewModel.loadLocation() }) {
-                        Text("Retry")
-                    }
                 }
 
                 state.cityName != null -> {
@@ -95,7 +92,23 @@ fun LocationScreen(
                 .background(Color.LightGray),
             contentAlignment = Alignment.Center
         ) {
-            Text("Map")
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator()
+                    Text(text = "Loading map...")
+                }
+
+                state.error != null -> {
+                    Text(text = "Error: ${state.error}", color = Color.Red)
+                    Button(onClick = { viewModel.loadLocation() }) {
+                        Text("Retry")
+                    }
+                }
+
+                state.location != null -> {
+                    MapScreen(state.location.latitude, state.location.longitude)
+                }
+            }
         }
     }
 }
