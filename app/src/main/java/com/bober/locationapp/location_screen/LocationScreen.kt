@@ -1,13 +1,18 @@
 package com.bober.locationapp.location_screen
 
 import android.Manifest
+import android.view.ViewGroup
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -23,14 +28,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 @Composable
 fun LocationScreen(
     viewModel: LocationViewModel = hiltViewModel()
-){
+) {
     val state = viewModel.state.value
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true) {
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
             viewModel.loadLocation()
         }
     }
@@ -49,25 +55,47 @@ fun LocationScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        if (state.isLoading) {
-            CircularProgressIndicator()
-            Text(text = "Fetching location and city...")
-        }
-        else if (state.error != null) {
-            Text(text = "Error: ${state.error}", color = Color.Red)
-            Button(onClick = { viewModel.loadLocation() }) {
-                Text("Retry")
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(3f)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator()
+                    Text(text = "Fetching location and city...")
+                }
+
+                state.error != null -> {
+                    Text(text = "Error: ${state.error}", color = Color.Red)
+                    Button(onClick = { viewModel.loadLocation() }) {
+                        Text("Retry")
+                    }
+                }
+
+                state.cityName != null -> {
+                    Text(text = "Your City:", style = MaterialTheme.typography.headlineSmall)
+                    Text(text = state.cityName, style = MaterialTheme.typography.headlineLarge)
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Text(text = "Coordinates:")
+                    Text(text = "Lat: ${state.location?.latitude}")
+                    Text(text = "Long: ${state.location?.longitude}")
+                }
             }
         }
-        else if (state.cityName != null) {
-            Text(text = "Your City:", style = MaterialTheme.typography.headlineSmall)
-            Text(text = state.cityName, style = MaterialTheme.typography.headlineLarge)
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(text = "Coordinates:")
-            Text(text = "Lat: ${state.location?.latitude}")
-            Text(text = "Long: ${state.location?.longitude}")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(7f)
+                .background(Color.LightGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Map")
         }
     }
 }

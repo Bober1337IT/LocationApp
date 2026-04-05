@@ -72,5 +72,5 @@ dependencies {
     implementation(libs.play.services.location)
 
     // Map
-    implementation("org.maplibre.compose:maplibre-compose:0.11.1")
+    implementation("org.maplibre.gl:android-sdk:11.8.0")
 }
