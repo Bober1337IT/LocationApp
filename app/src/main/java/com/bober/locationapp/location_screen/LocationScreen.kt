@@ -18,18 +18,23 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
 fun LocationScreen(
     viewModel: LocationViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.value
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -37,7 +42,7 @@ fun LocationScreen(
         if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
             permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
         ) {
-            viewModel.loadLocation()
+            viewModel.startTracking()
         }
     }
 
@@ -48,6 +53,28 @@ fun LocationScreen(
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         )
+    }
+
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    viewModel.startTracking()
+                }
+
+                Lifecycle.Event.ON_PAUSE -> {
+                    viewModel.stopTracking()
+                }
+
+                else -> {}
+            }
+        }
+
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
+        }
     }
 
     Column(
@@ -100,7 +127,7 @@ fun LocationScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(text = "Error: ${state.error}", color = Color.Red)
-                        Button(onClick = { viewModel.loadLocation() }) {
+                        Button(onClick = { viewModel.startTracking() }) {
                             Text("Retry")
                         }
                     }

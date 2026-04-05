@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bober.locationapp.location_tracker.LocationTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,26 +19,37 @@ class LocationViewModel @Inject constructor(
     private val _state = mutableStateOf(LocationState())
     val state: State<LocationState> = _state
 
-    fun loadLocation() {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true, error = null)
+    private var trackingJob: Job? = null
 
-            val location = locationTracker.getCurrentLocation()
+    fun startTracking() {
+        trackingJob = viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true)
 
-            if (location != null) {
-                val city = locationTracker.getCurrentCity(location.latitude, location.longitude)
-
-                _state.value = _state.value.copy(
-                    location = location,
-                    cityName = city ?: "Unknown City",
-                    isLoading = false
-                )
-            } else {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = "Could not retrieve location. Check GPS or Network."
-                )
+            locationTracker.getLocationUpdates().collectLatest { location ->
+                if (location != null) {
+                    val city = locationTracker.getCurrentCity(location.latitude, location.longitude)
+                    _state.value = _state.value.copy(
+                        location = location,
+                        cityName = city ?: "Unknown City",
+                        isLoading = false,
+                        error = null
+                    )
+                } else {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = "GPS is off or no permissions."
+                    )
+                }
             }
         }
+    }
+    fun stopTracking() {
+        trackingJob?.cancel()
+        _state.value = _state.value.copy(isLoading = false)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopTracking()
     }
 }

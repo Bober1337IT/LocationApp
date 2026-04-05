@@ -8,30 +8,40 @@ import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.location.LocationManager
+import com.google.android.gms.location.LocationRequest
 import android.os.Build
+import android.os.Looper
 import androidx.core.content.ContextCompat
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlinx.coroutines.channels.awaitClose
 
 class LocationTracker @Inject constructor(
     private val locationClient: FusedLocationProviderClient,
     private val application: Application
 ) {
 
+    private val hasAccessFineLocationPermission: Boolean
+        get() = ContextCompat.checkSelfPermission(
+        application,
+        Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+
+    private val hasAccessCoarseLocationPermission: Boolean
+        get() = ContextCompat.checkSelfPermission(
+        application,
+        Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
+
     suspend fun getCurrentLocation(): Location? {
-
-        val hasAccessFineLocationPermission = ContextCompat.checkSelfPermission(
-            application,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
-
-        val hasAccessCoarseLocationPermission = ContextCompat.checkSelfPermission(
-            application,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED
 
         val locationManager =
             application.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -39,8 +49,6 @@ class LocationTracker @Inject constructor(
             locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || locationManager.isProviderEnabled(
                 LocationManager.GPS_PROVIDER
             )
-
-        println("DEBUG_GPS: Coarse: $hasAccessCoarseLocationPermission, Fine: $hasAccessFineLocationPermission, GPS Enabled: $isGpsEnabled")
 
         if (!hasAccessCoarseLocationPermission || !hasAccessFineLocationPermission || !isGpsEnabled) {
             return null
@@ -93,6 +101,38 @@ class LocationTracker @Inject constructor(
                     cont.resume(null)
                 }
             }
+        }
+    }
+
+    fun getLocationUpdates(): Flow<Location?> = callbackFlow {
+
+        if (!hasAccessFineLocationPermission && !hasAccessCoarseLocationPermission) {
+            trySend(null)
+            close()
+            return@callbackFlow
+        }
+
+        val request = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L)
+            .setMinUpdateIntervalMillis(2000L)
+            .build()
+
+        val callback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                super.onLocationResult(result)
+                result.lastLocation?.let {
+                    trySend(it)
+                }
+            }
+        }
+
+        locationClient.requestLocationUpdates(
+            request,
+            callback,
+            Looper.getMainLooper()
+        )
+
+        awaitClose {
+            locationClient.removeLocationUpdates(callback)
         }
     }
 }
