@@ -1,4 +1,4 @@
-package com.bober.locationapp.location_screen
+package com.bober.locationapp.location_screen.map_screen
 
 import android.location.Location
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,7 +19,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
+import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.MaplibreMap
+import org.maplibre.compose.map.OrnamentOptions
 import org.maplibre.compose.style.BaseStyle
 import org.maplibre.compose.style.rememberStyleState
 import org.maplibre.compose.util.ClickResult
@@ -92,6 +94,9 @@ fun MapScreen2(location: Location?) {
             baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
             cameraState = cameraState,
             styleState = rememberStyleState(),
+            options = MapOptions(
+                ornamentOptions = OrnamentOptions(isLogoEnabled = false, isAttributionEnabled = false, isScaleBarEnabled = false),
+            ),
             onMapClick = { position, _ ->
                 droppedMarkerPosition = position
                 ClickResult.Pass

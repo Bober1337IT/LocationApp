@@ -1,4 +1,4 @@
-package com.bober.locationapp.location_screen
+package com.bober.locationapp.location_screen.map_screen
 
 import android.annotation.SuppressLint
 import android.location.Location
