@@ -133,7 +133,7 @@ fun LocationScreen(
                 }
 
                 state.location != null -> {
-                    MapScreen(state.location)
+                    MapScreen2(state.location)
                 }
             }
         }
