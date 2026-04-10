@@ -27,6 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.bober.locationapp.location_screen.map_screen.MapScreen2
 
 @Composable
 fun LocationScreen(
@@ -133,7 +134,7 @@ fun LocationScreen(
                 }
 
                 state.location != null -> {
-                    MapScreen(state.location)
+                    MapScreen2(state.location)
                 }
             }
         }

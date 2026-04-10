@@ -72,5 +72,9 @@ dependencies {
     implementation(libs.play.services.location)
 
     // Map
-    implementation("org.maplibre.gl:android-sdk:11.8.0")
+    //implementation("org.maplibre.gl:android-sdk:11.8.0")
+    implementation(libs.maplibre.composeMaterial3)
+
+    // Icons
+    implementation("androidx.compose.material:material-icons-extended")
 }
