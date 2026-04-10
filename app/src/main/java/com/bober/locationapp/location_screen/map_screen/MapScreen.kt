@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.bober.locationapp.location_screen.map_screen.components.UserLocationLayer
+import com.bober.locationapp.location_screen.map_screen.components.rotation.PinLayer
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -42,7 +43,7 @@ fun MapScreen2(location: Location?) {
     var isProgrammaticMovement by remember { mutableStateOf(false) }
 
     // State for the dropped marker
-    var droppedMarkerPosition by remember { mutableStateOf<Position?>(null) }
+    var droppedPinPosition by remember { mutableStateOf<Position?>(null) }
 
     val cameraState = rememberCameraState(
         firstPosition = CameraPosition(
@@ -99,12 +100,16 @@ fun MapScreen2(location: Location?) {
                 ornamentOptions = OrnamentOptions(isLogoEnabled = false, isAttributionEnabled = false, isScaleBarEnabled = false),
             ),
             onMapClick = { position, _ ->
-                droppedMarkerPosition = position
+                droppedPinPosition = position
                 ClickResult.Pass
             }
         ) {
             if (location != null) {
                 UserLocationLayer(userPosition = userPosition)
+            }
+
+            droppedPinPosition?.let { pinPos ->
+                PinLayer(pinPosition = pinPos)
             }
         }
     }
