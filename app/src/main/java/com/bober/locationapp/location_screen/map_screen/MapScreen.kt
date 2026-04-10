@@ -17,6 +17,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.bober.locationapp.location_screen.map_screen.components.UserLocationLayer
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -58,8 +59,8 @@ fun MapScreen2(location: Location?) {
                 finalPosition = CameraPosition(target = userPosition, zoom = 15.0),
                 duration = 1000.milliseconds
             )
+            isProgrammaticMovement = false
         }
-        isProgrammaticMovement = false
     }
 
     // Effect to detect manual camera movement to unlock the FAB
@@ -102,7 +103,9 @@ fun MapScreen2(location: Location?) {
                 ClickResult.Pass
             }
         ) {
-
+            if (location != null) {
+                UserLocationLayer(userPosition = userPosition)
+            }
         }
     }
 }
