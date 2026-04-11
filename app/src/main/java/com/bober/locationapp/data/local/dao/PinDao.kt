@@ -23,4 +23,7 @@ interface PinDao {
 
     @Delete
     suspend fun deletePin(pin: PinEntity)
+
+    @Query("DELETE FROM pins WHERE id = :pinId")
+    suspend fun deletePinById(pinId: Long)
 }

@@ -29,4 +29,8 @@ class PinRepositoryImpl(
     override suspend fun deletePin(pin: Pin) {
         dao.deletePin(pin.toPinEntity())
     }
+
+    override suspend fun deletePinById(id: Long) {
+        dao.deletePinById(id)
+    }
 }

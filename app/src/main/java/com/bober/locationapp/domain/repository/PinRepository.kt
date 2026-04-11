@@ -13,4 +13,6 @@ interface PinRepository {
     suspend fun insertPin(pin: Pin)
 
     suspend fun deletePin(pin: Pin)
+
+    suspend fun deletePinById(id: Long)
 }
