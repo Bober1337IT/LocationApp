@@ -1,4 +1,4 @@
-package com.bober.locationapp.location_screen
+package com.bober.locationapp.presentation.location_screen
 
 import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -27,7 +27,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.bober.locationapp.location_screen.map_screen.MapScreen2
+import com.bober.locationapp.presentation.location_screen.map_screen.MapScreen2
 
 @Composable
 fun LocationScreen(

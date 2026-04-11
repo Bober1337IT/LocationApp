@@ -1,6 +1,5 @@
-package com.bober.locationapp.ui.theme
+package com.bober.locationapp.presentation.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

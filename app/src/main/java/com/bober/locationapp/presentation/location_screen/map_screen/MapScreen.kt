@@ -1,4 +1,4 @@
-package com.bober.locationapp.location_screen.map_screen
+package com.bober.locationapp.presentation.location_screen.map_screen
 
 import android.location.Location
 import androidx.compose.foundation.layout.Box
@@ -24,9 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.bober.locationapp.location_screen.map_screen.components.layers.UserLocationLayer
-import com.bober.locationapp.location_screen.map_screen.components.layers.PinLayer
-import com.bober.locationapp.location_screen.map_screen.components.rememberDeviceRotation
+import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.UserLocationLayer
+import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.PinLayer
+import com.bober.locationapp.presentation.location_screen.map_screen.components.rememberDeviceRotation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions

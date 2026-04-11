@@ -1,12 +1,12 @@
-package com.bober.locationapp
+package com.bober.locationapp.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
-import com.bober.locationapp.location_screen.LocationScreen
-import com.bober.locationapp.ui.theme.LocationAppTheme
+import com.bober.locationapp.presentation.location_screen.LocationScreen
+import com.bober.locationapp.presentation.ui.theme.LocationAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             LocationAppTheme {
-                Surface{
+                Surface {
                     LocationScreen()
                 }
             }

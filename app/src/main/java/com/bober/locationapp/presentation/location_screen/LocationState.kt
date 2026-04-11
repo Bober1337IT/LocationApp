@@ -1,4 +1,4 @@
-package com.bober.locationapp.location_screen
+package com.bober.locationapp.presentation.location_screen
 
 import android.location.Location
 
