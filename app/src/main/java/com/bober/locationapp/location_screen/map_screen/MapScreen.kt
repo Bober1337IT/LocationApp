@@ -1,10 +1,13 @@
 package com.bober.locationapp.location_screen.map_screen
 
 import android.location.Location
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -16,9 +19,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import com.bober.locationapp.location_screen.map_screen.components.UserLocationLayer
-import com.bober.locationapp.location_screen.map_screen.components.rotation.PinLayer
+import com.bober.locationapp.location_screen.map_screen.components.PinLayer
+import com.bober.locationapp.location_screen.map_screen.components.rotation.rememberDeviceRotation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -45,6 +54,8 @@ fun MapScreen2(location: Location?) {
     // State for the dropped marker
     var droppedPinPosition by remember { mutableStateOf<Position?>(null) }
 
+    val rotation = rememberDeviceRotation()
+
     val cameraState = rememberCameraState(
         firstPosition = CameraPosition(
             target = userPosition,
@@ -70,46 +81,64 @@ fun MapScreen2(location: Location?) {
             fixedCamera = false
         }
     }
-
-    Scaffold(
-        floatingActionButton = {
-            if (!fixedCamera) {
-                FloatingActionButton(
-                    onClick = { fixedCamera = true },
-                    shape = CircleShape,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = "Center Map"
-                    )
+    Box(Modifier.fillMaxSize()) {
+        Scaffold(
+            floatingActionButton = {
+                if (!fixedCamera) {
+                    FloatingActionButton(
+                        onClick = { fixedCamera = true },
+                        shape = CircleShape,
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = "Center Map"
+                        )
+                    }
                 }
             }
-        }
-    ) { paddingValues ->
-        MaplibreMap(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize(),
+        ) { paddingValues ->
+            MaplibreMap(
+                modifier = Modifier
+                    .padding(paddingValues)
+                    .fillMaxSize(),
 
-            baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
-            cameraState = cameraState,
-            styleState = rememberStyleState(),
-            options = MapOptions(
-                ornamentOptions = OrnamentOptions(isLogoEnabled = false, isAttributionEnabled = false, isScaleBarEnabled = false),
-            ),
-            onMapClick = { position, _ ->
-                droppedPinPosition = position
-                ClickResult.Pass
-            }
-        ) {
-            if (location != null) {
-                UserLocationLayer(userPosition = userPosition)
+                baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
+                cameraState = cameraState,
+                styleState = rememberStyleState(),
+                options = MapOptions(
+                    ornamentOptions = OrnamentOptions(
+                        isLogoEnabled = false,
+                        isAttributionEnabled = false,
+                        isScaleBarEnabled = false
+                    ),
+                ),
+                onMapClick = { position, _ ->
+                    droppedPinPosition = position
+                    ClickResult.Pass
+                }
+            ) {
+                location?.let {
+                    UserLocationLayer(userPosition = userPosition)
+                }
+
+                droppedPinPosition?.let { pinPos ->
+                    PinLayer(pinPosition = pinPos)
+                }
             }
 
-            droppedPinPosition?.let { pinPos ->
-                PinLayer(pinPosition = pinPos)
+            location?.let {
+                Icon(
+                    imageVector = Icons.Default.ArrowUpward,
+                    contentDescription = null,
+                    tint = Color.Black,
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = 32.dp)
+                        .size(48.dp)
+                        .rotate(rotation)
+                )
             }
         }
     }

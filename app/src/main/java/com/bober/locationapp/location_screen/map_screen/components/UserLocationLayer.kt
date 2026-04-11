@@ -16,7 +16,6 @@ import kotlinx.serialization.json.JsonObject
 
 @Composable
 fun UserLocationLayer(userPosition: Position) {
-    val deviceRotation = rememberDeviceRotation()
 
     val userSource = rememberGeoJsonSource(
         data = GeoJsonData.Features(
@@ -46,6 +45,5 @@ fun UserLocationLayer(userPosition: Position) {
         strokeColor = const(Color.Blue),
         strokeWidth = const(2.dp)
     )
-
 
 }

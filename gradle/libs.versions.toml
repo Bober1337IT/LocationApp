@@ -38,6 +38,7 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 # Location
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version = "0.12.1" }
 maplibre-composeMaterial3 = { module = "org.maplibre.compose:maplibre-compose-material3", version = "0.12.1" }
 
 [plugins]
