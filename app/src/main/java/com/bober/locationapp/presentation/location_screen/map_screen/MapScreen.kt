@@ -3,10 +3,8 @@ package com.bober.locationapp.presentation.location_screen.map_screen
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -19,16 +17,12 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bober.locationapp.domain.model.GeoCoordinate
 import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.UserLocationLayer
 import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.PinLayer
-import com.bober.locationapp.presentation.location_screen.map_screen.components.rememberDeviceRotation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -56,8 +50,6 @@ fun MapScreen(
     // State for tracking if camera is locked to user
     var fixedCamera by remember { mutableStateOf(true) }
     var isProgrammaticMovement by remember { mutableStateOf(false) }
-
-    val rotation = rememberDeviceRotation()
 
     val cameraState = rememberCameraState(
         firstPosition = CameraPosition(
@@ -123,7 +115,10 @@ fun MapScreen(
                 },
             ) {
                 location?.let {
-                    UserLocationLayer(userPosition = userPosition)
+                    UserLocationLayer(
+                        userPosition = userPosition,
+                        metersPerDpAtTarget = cameraState.metersPerDpAtTarget
+                    )
                 }
 
                 state.pins.forEach { pin ->
@@ -134,19 +129,6 @@ fun MapScreen(
                         )
                     }
                 }
-            }
-
-            location?.let {
-                Icon(
-                    imageVector = Icons.Default.ArrowUpward,
-                    contentDescription = null,
-                    tint = Color.Black,
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(top = 32.dp)
-                        .size(48.dp)
-                        .rotate(rotation)
-                )
             }
         }
     }
