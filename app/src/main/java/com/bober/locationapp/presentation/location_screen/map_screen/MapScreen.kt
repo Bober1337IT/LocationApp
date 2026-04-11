@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.UserLocationLayer
 import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.PinLayer
 import com.bober.locationapp.presentation.location_screen.map_screen.components.rememberDeviceRotation
@@ -39,7 +41,12 @@ import org.maplibre.spatialk.geojson.Position
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
-fun MapScreen2(location: Location?) {
+fun MapScreen(
+    location: Location?,
+    viewModel: MapViewModel = hiltViewModel()
+) {
+
+    val state by viewModel.state
 
     // Current user position from the location object
     val userPosition = remember(location) {
@@ -49,9 +56,6 @@ fun MapScreen2(location: Location?) {
     // State for tracking if camera is locked to user
     var fixedCamera by remember { mutableStateOf(true) }
     var isProgrammaticMovement by remember { mutableStateOf(false) }
-
-    // State for the dropped marker
-    var droppedPinPosition by remember { mutableStateOf<Position?>(null) }
 
     val rotation = rememberDeviceRotation()
 
@@ -114,7 +118,7 @@ fun MapScreen2(location: Location?) {
                     ),
                 ),
                 onMapLongClick = { position, _ ->
-                    droppedPinPosition = position
+                    viewModel.onMapLongClick(position)
                     ClickResult.Pass
                 },
             ) {
@@ -122,8 +126,13 @@ fun MapScreen2(location: Location?) {
                     UserLocationLayer(userPosition = userPosition)
                 }
 
-                droppedPinPosition?.let { pinPos ->
-                    PinLayer(pinPosition = pinPos)
+                state.pins.forEach { pin ->
+                    key(pin.id) {
+                        PinLayer(
+                            id = pin.id.toString(),
+                            pinPosition = Position(pin.longitude, pin.latitude)
+                        )
+                    }
                 }
             }
 

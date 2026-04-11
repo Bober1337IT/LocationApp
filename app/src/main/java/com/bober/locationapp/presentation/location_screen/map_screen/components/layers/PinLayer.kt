@@ -14,7 +14,7 @@ import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 
 @Composable
-fun PinLayer(pinPosition: Position) {
+fun PinLayer(id: String, pinPosition: Position) {
 
     val pinSource = rememberGeoJsonSource(
         data = GeoJsonData.Features(
@@ -30,7 +30,7 @@ fun PinLayer(pinPosition: Position) {
     )
 
     CircleLayer(
-        id = "pin-layer",
+        id = id,
         source = pinSource,
         color = const(Color.Blue),
         radius = const(5.dp),
