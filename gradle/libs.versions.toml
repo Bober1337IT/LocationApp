@@ -12,6 +12,7 @@ hilt = "2.52"
 ksp = "2.1.10-1.0.30"
 coroutines = "1.9.0"
 playServicesLocation = "21.0.1"
+room = "2.6.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -40,6 +41,11 @@ kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version = "0.12.1" }
 maplibre-composeMaterial3 = { module = "org.maplibre.compose:maplibre-compose-material3", version = "0.12.1" }
+
+# Room
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

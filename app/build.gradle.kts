@@ -75,6 +75,11 @@ dependencies {
     implementation(libs.maplibre.composeMaterial3)
     implementation(libs.maplibre.compose)
 
+    // Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
 }
