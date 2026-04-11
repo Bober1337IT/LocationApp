@@ -9,7 +9,6 @@ import com.bober.locationapp.domain.repository.PinRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import org.maplibre.spatialk.geojson.Position
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,12 +31,12 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun onMapLongClick(position: Position) {
+    fun onMapLongClick(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             val pins = _state.value.pins
             val existingPin = pins.find {
-                Math.abs(it.latitude - position.latitude) < 0.0005 &&
-                        Math.abs(it.longitude - position.longitude) < 0.0005
+                Math.abs(it.latitude - latitude) < 0.0005 &&
+                    Math.abs(it.longitude - longitude) < 0.0005
             }
 
             if (existingPin != null) {
@@ -46,8 +45,8 @@ class MapViewModel @Inject constructor(
                 val newPin = Pin(
                     name = "New Point",
                     description = null,
-                    latitude = position.latitude,
-                    longitude = position.longitude,
+                    latitude = latitude,
+                    longitude = longitude,
                     createdAt = System.currentTimeMillis()
                 )
                 repository.insertPin(newPin)

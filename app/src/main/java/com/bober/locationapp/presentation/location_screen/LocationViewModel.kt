@@ -4,7 +4,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bober.locationapp.location_tracker.LocationTracker
+import com.bober.locationapp.domain.repository.UserLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
@@ -13,8 +13,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LocationViewModel @Inject constructor(
-    private val locationTracker: LocationTracker
-): ViewModel() {
+    private val userLocationRepository: UserLocationRepository
+) : ViewModel() {
 
     private val _state = mutableStateOf(LocationState())
     val state: State<LocationState> = _state
@@ -25,11 +25,14 @@ class LocationViewModel @Inject constructor(
         trackingJob = viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
 
-            locationTracker.getLocationUpdates().collectLatest { location ->
-                if (location != null) {
-                    val city = locationTracker.getCurrentCity(location.latitude, location.longitude)
+            userLocationRepository.observeLocationUpdates().collectLatest { coordinate ->
+                if (coordinate != null) {
+                    val city = userLocationRepository.resolveCityName(
+                        coordinate.latitude,
+                        coordinate.longitude
+                    )
                     _state.value = _state.value.copy(
-                        location = location,
+                        location = coordinate,
                         cityName = city ?: "Unknown City",
                         isLoading = false,
                         error = null

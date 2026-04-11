@@ -1,6 +1,5 @@
 package com.bober.locationapp.presentation.location_screen.map_screen
 
-import android.location.Location
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,6 +25,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.bober.locationapp.domain.model.GeoCoordinate
 import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.UserLocationLayer
 import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.PinLayer
 import com.bober.locationapp.presentation.location_screen.map_screen.components.rememberDeviceRotation
@@ -42,7 +42,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun MapScreen(
-    location: Location?,
+    location: GeoCoordinate?,
     viewModel: MapViewModel = hiltViewModel()
 ) {
 
@@ -118,7 +118,7 @@ fun MapScreen(
                     ),
                 ),
                 onMapLongClick = { position, _ ->
-                    viewModel.onMapLongClick(position)
+                    viewModel.onMapLongClick(position.latitude, position.longitude)
                     ClickResult.Pass
                 },
             ) {

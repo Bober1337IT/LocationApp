@@ -4,7 +4,9 @@ import android.app.Application
 import androidx.room.Room
 import com.bober.locationapp.data.local.Database
 import com.bober.locationapp.data.local.repository.PinRepositoryImpl
+import com.bober.locationapp.data.local.repository.UserLocationRepositoryImpl
 import com.bober.locationapp.domain.repository.PinRepository
+import com.bober.locationapp.domain.repository.UserLocationRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.Module
@@ -35,7 +37,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePinRepository(db: Database): PinRepository{
+    fun providePinRepository(db: Database): PinRepository {
         return PinRepositoryImpl(db.pinDao())
     }
+
+    @Provides
+    @Singleton
+    fun provideUserLocationRepository(
+        impl: UserLocationRepositoryImpl
+    ): UserLocationRepository = impl
 }

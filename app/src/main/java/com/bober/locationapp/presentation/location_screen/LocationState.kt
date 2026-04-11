@@ -1,9 +1,9 @@
 package com.bober.locationapp.presentation.location_screen
 
-import android.location.Location
+import com.bober.locationapp.domain.model.GeoCoordinate
 
 data class LocationState(
-    val location: Location? = null,
+    val location: GeoCoordinate? = null,
     val cityName: String? = null,
     val isLoading: Boolean = false,
     val error: String? = null
