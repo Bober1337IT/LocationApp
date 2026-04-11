@@ -1,4 +1,4 @@
-package com.bober.locationapp.location_screen.map_screen.components.rotation
+package com.bober.locationapp.location_screen.map_screen.components
 
 import android.content.Context
 import android.hardware.Sensor
