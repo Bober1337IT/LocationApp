@@ -23,11 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.bober.locationapp.location_screen.map_screen.components.UserLocationLayer
-import com.bober.locationapp.location_screen.map_screen.components.PinLayer
-import com.bober.locationapp.location_screen.map_screen.components.rotation.rememberDeviceRotation
+import com.bober.locationapp.location_screen.map_screen.components.layers.UserLocationLayer
+import com.bober.locationapp.location_screen.map_screen.components.layers.PinLayer
+import com.bober.locationapp.location_screen.map_screen.components.rememberDeviceRotation
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -114,10 +113,10 @@ fun MapScreen2(location: Location?) {
                         isScaleBarEnabled = false
                     ),
                 ),
-                onMapClick = { position, _ ->
+                onMapLongClick = { position, _ ->
                     droppedPinPosition = position
                     ClickResult.Pass
-                }
+                },
             ) {
                 location?.let {
                     UserLocationLayer(userPosition = userPosition)

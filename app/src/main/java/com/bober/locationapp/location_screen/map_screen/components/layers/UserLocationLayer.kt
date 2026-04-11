@@ -1,9 +1,8 @@
-package com.bober.locationapp.location_screen.map_screen.components
+package com.bober.locationapp.location_screen.map_screen.components.layers
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.bober.locationapp.location_screen.map_screen.components.rotation.rememberDeviceRotation
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.spatialk.geojson.Feature
