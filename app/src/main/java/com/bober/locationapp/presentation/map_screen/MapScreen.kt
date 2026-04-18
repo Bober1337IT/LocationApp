@@ -36,6 +36,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toColorLong
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bober.locationapp.presentation.map_screen.components.layers.UserLocationLayer
@@ -199,6 +201,7 @@ fun MapScreen(
                         PinLayer(
                             id = pin.id.toString(),
                             pinPosition = Position(pin.longitude, pin.latitude),
+                            color = pin.color,
                             zoom = cameraState.position.zoom
                         )
                     }

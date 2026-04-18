@@ -14,7 +14,7 @@ import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 
 @Composable
-fun PinLayer(id: String, pinPosition: Position, zoom: Double) {
+fun PinLayer(id: String, pinPosition: Position, color: Long, zoom: Double) {
 
     val calculatedRadius = when {
         zoom <= 7.0 -> 2.dp
@@ -43,7 +43,7 @@ fun PinLayer(id: String, pinPosition: Position, zoom: Double) {
     CircleLayer(
         id = id,
         source = pinSource,
-        color = const(Color.Blue),
+        color = const(Color(color.toULong())),
         radius = const(calculatedRadius),
         minZoom = 5f,
     )

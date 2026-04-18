@@ -2,7 +2,8 @@ package com.bober.locationapp.presentation.map_screen
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.snapshots.toInt
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toColorLong
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bober.locationapp.domain.model.Pin
@@ -82,6 +83,7 @@ class MapViewModel @Inject constructor(
                     name = "",
                     city = userLocationRepository.resolveCityName(latitude, longitude) ?: "Unknown",
                     description = null,
+                    color = Color.Blue.toColorLong(),
                     latitude = latitude,
                     longitude = longitude,
                     createdAt = System.currentTimeMillis(),

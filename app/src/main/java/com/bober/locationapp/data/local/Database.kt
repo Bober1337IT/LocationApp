@@ -7,7 +7,7 @@ import com.bober.locationapp.data.local.entity.PinEntity
 
 @Database(
     entities = [PinEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class Database: RoomDatabase() {
