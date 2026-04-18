@@ -66,7 +66,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun onMapLongClick(latitude: Double, longitude: Double) {
+    fun addRemovePin(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             val pins = _state.value.pins
             val existingPin = pins.find {
@@ -90,7 +90,7 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun onMapClick(latitude: Double, longitude: Double) {
+    fun showPinDetails(latitude: Double, longitude: Double) {
         viewModelScope.launch {
             val pins = _state.value.pins
             val existingPinMarker = pins.find {
@@ -104,5 +104,9 @@ class MapViewModel @Inject constructor(
                 _state.value = _state.value.copy(pin = null)
             }
         }
+    }
+
+    fun dismissPinDetails() {
+        _state.value = _state.value.copy(pin = null)
     }
 }

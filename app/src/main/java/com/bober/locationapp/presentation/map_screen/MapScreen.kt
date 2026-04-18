@@ -4,18 +4,23 @@ import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -32,7 +37,6 @@ import com.bober.locationapp.presentation.map_screen.components.layers.PinLayer
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -44,12 +48,14 @@ import org.maplibre.compose.util.ClickResult
 import org.maplibre.spatialk.geojson.Position
 import kotlin.time.Duration.Companion.milliseconds
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel = hiltViewModel()
 ) {
 
     val state by viewModel.state
+    val sheetState = rememberModalBottomSheetState()
 
     val lifecycle = LocalLifecycleOwner.current.lifecycle
 
@@ -136,7 +142,40 @@ fun MapScreen(
             }
         ) { paddingValues ->
             if (state.pin != null){
-                Text(text = state.pin?.city ?: "Unknown City" )
+                ModalBottomSheet(
+                    onDismissRequest = {
+                        viewModel.dismissPinDetails()
+                    },
+                    sheetState = sheetState
+                ) {
+                    // Content of the bottom sheet
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .padding(bottom = 32.dp)
+                    ) {
+                        if (!state.pin?.name.isNullOrEmpty()){
+                            Text(
+                                text = state.pin?.name!!,
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                        }
+                        Text(
+                            text = state.pin?.city ?: "Unknown City",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        Text(
+                            text = "Coordinates: ${state.pin?.latitude}, ${state.pin?.longitude}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                        state.pin?.description?.let {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Text(text = it, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
             }
             MaplibreMap(
                 modifier = Modifier
@@ -154,11 +193,11 @@ fun MapScreen(
                     ),
                 ),
                 onMapLongClick = { position, _ ->
-                    viewModel.onMapLongClick(position.latitude, position.longitude)
+                    viewModel.addRemovePin(position.latitude, position.longitude)
                     ClickResult.Pass
                 },
                 onMapClick = { position, _ ->
-                    viewModel.onMapClick(position.latitude, position.longitude)
+                    viewModel.showPinDetails(position.latitude, position.longitude)
                     ClickResult.Pass
                 }
             ) {
