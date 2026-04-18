@@ -43,6 +43,7 @@ import com.bober.locationapp.presentation.map_screen.components.layers.PinLayer
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.bober.locationapp.presentation.map_screen.components.PinDetailsSheet
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -151,84 +152,17 @@ fun MapScreen(
             }
         ) { paddingValues ->
 
-            if (state.pin != null) {
-                ModalBottomSheet(
-                    onDismissRequest = {
-                        viewModel.dismissPinDetails()
-                    },
-                    sheetState = sheetState
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .padding(bottom = 32.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = if (state.isEditingPin) "Edit Pin" else "Pin Details",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.weight(1f)
-                            )
-                            IconButton(onClick = {
-                                if (state.isEditingPin) {
-                                    viewModel.updatePin(editedName, editedDescription)
-                                } else {
-                                    viewModel.toggleEditMode()
-                                }
-                            }) {
-                                Icon(
-                                    imageVector = if (state.isEditingPin) Icons.Default.Check else Icons.Default.Edit,
-                                    contentDescription = if (state.isEditingPin) "Save" else "Edit",
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        if (state.isEditingPin) {
-                            OutlinedTextField(
-                                value = editedName,
-                                onValueChange = { editedName = it },
-                                label = { Text("Name") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                            OutlinedTextField(
-                                value = editedDescription,
-                                onValueChange = { editedDescription = it },
-                                label = { Text("Description") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        } else {
-                            // TRYB PODGLĄDU
-                            if (!state.pin?.name.isNullOrBlank()) {
-                                Text(
-                                    text = state.pin?.name!!,
-                                    style = MaterialTheme.typography.headlineSmall
-                                )
-                            }
-                            Text(
-                                text = state.pin?.city ?: "Unknown City",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                            Text(
-                                text = "Coordinates: ${state.pin?.latitude}, ${state.pin?.longitude}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.secondary
-                            )
-                            state.pin?.description?.let {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(text = it, style = MaterialTheme.typography.bodyMedium)
-                            }
-                        }
+            state.pin?.let { currentPin ->
+                PinDetailsSheet(
+                    pin = currentPin,
+                    isEditing = state.isEditingPin,
+                    sheetState = sheetState,
+                    onDismissRequest = { viewModel.dismissPinDetails() },
+                    onToggleEdit = { viewModel.toggleEditMode() },
+                    onSave = { name, description ->
+                        viewModel.updatePin(name, description)
                     }
-                }
+                )
             }
             MaplibreMap(
                 modifier = Modifier
