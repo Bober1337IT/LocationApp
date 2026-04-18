@@ -4,7 +4,9 @@ import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -13,6 +15,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -22,12 +25,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bober.locationapp.presentation.map_screen.components.layers.UserLocationLayer
 import com.bober.locationapp.presentation.map_screen.components.layers.PinLayer
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -130,6 +135,9 @@ fun MapScreen(
                 }
             }
         ) { paddingValues ->
+            if (state.pin != null){
+                Text(text = state.pin?.city ?: "Unknown City" )
+            }
             MaplibreMap(
                 modifier = Modifier
                     .padding(paddingValues)
@@ -149,6 +157,10 @@ fun MapScreen(
                     viewModel.onMapLongClick(position.latitude, position.longitude)
                     ClickResult.Pass
                 },
+                onMapClick = { position, _ ->
+                    viewModel.onMapClick(position.latitude, position.longitude)
+                    ClickResult.Pass
+                }
             ) {
                 state.location?.let {
                     UserLocationLayer(

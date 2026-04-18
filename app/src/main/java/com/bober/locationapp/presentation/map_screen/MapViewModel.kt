@@ -79,12 +79,29 @@ class MapViewModel @Inject constructor(
             } else {
                 val newPin = Pin(
                     name = "New Point",
+                    city = userLocationRepository.resolveCityName(latitude, longitude) ?: "Unknown",
                     description = null,
                     latitude = latitude,
                     longitude = longitude,
-                    createdAt = System.currentTimeMillis()
+                    createdAt = System.currentTimeMillis(),
                 )
                 repository.insertPin(newPin)
+            }
+        }
+    }
+
+    fun onMapClick(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
+            val pins = _state.value.pins
+            val existingPinMarker = pins.find {
+                Math.abs(it.latitude - latitude) < 0.0005 &&
+                        Math.abs(it.longitude - longitude) < 0.0005
+            }
+            if (existingPinMarker != null) {
+                val fullPin = repository.getPinDetailsById(existingPinMarker.id)
+                _state.value = _state.value.copy(pin = fullPin)
+            } else {
+                _state.value = _state.value.copy(pin = null)
             }
         }
     }

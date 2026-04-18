@@ -9,6 +9,7 @@ fun PinEntity.toPin(): Pin {
     return Pin(
         id = id,
         name = name,
+        city = city,
         description = description,
         latitude = latitude,
         longitude = longitude,
@@ -28,6 +29,7 @@ fun Pin.toPinEntity(): PinEntity {
     return PinEntity(
         id = id,
         name = name,
+        city = city,
         description = description,
         latitude = latitude,
         longitude = longitude,
