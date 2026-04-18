@@ -155,7 +155,7 @@ fun MapScreen(
                             .padding(16.dp)
                             .padding(bottom = 32.dp)
                     ) {
-                        if (!state.pin?.name.isNullOrEmpty()){
+                        if (!state.pin?.name.isNullOrBlank()){
                             Text(
                                 text = state.pin?.name!!,
                                 style = MaterialTheme.typography.headlineSmall
@@ -211,7 +211,8 @@ fun MapScreen(
                     key(pin.id) {
                         PinLayer(
                             id = pin.id.toString(),
-                            pinPosition = Position(pin.longitude, pin.latitude)
+                            pinPosition = Position(pin.longitude, pin.latitude),
+                            zoom = cameraState.position.zoom
                         )
                     }
                 }

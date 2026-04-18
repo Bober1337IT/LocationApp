@@ -14,7 +14,18 @@ import org.maplibre.spatialk.geojson.Point
 import org.maplibre.spatialk.geojson.Position
 
 @Composable
-fun PinLayer(id: String, pinPosition: Position) {
+fun PinLayer(id: String, pinPosition: Position, zoom: Double) {
+
+    val calculatedRadius = when {
+        zoom <= 7.0 -> 2.dp
+        zoom >= 15.0 -> 8.dp
+        else -> {
+            // currentSize = minSize + (progress * totalSizeRange)
+            val progress = (zoom - 7.0) / (15.0 - 7.0)
+            val sizeRange = 8.dp - 2.dp
+            2.dp + (sizeRange * progress.toFloat())
+        }
+    }
 
     val pinSource = rememberGeoJsonSource(
         data = GeoJsonData.Features(
@@ -33,7 +44,7 @@ fun PinLayer(id: String, pinPosition: Position) {
         id = id,
         source = pinSource,
         color = const(Color.Blue),
-        radius = const(5.dp),
-        minZoom = 12f,
+        radius = const(calculatedRadius),
+        minZoom = 5f,
     )
 }
