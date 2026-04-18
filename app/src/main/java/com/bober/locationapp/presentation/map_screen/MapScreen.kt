@@ -161,8 +161,8 @@ fun MapScreen(
                     sheetState = sheetState,
                     onDismissRequest = { viewModel.dismissPinDetails() },
                     onToggleEdit = { viewModel.toggleEditMode() },
-                    onSave = { name, description ->
-                        viewModel.updatePin(name, description)
+                    onSave = { name, description, color ->
+                        viewModel.updatePin(name, description, color)
                     }
                 )
             }

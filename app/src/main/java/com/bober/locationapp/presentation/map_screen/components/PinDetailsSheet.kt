@@ -18,12 +18,13 @@ fun PinDetailsSheet(
     isEditing: Boolean,
     onDismissRequest: () -> Unit,
     onToggleEdit: () -> Unit,
-    onSave: (name: String, description: String?) -> Unit,
+    onSave: (name: String, description: String?, color: Long) -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState()
 ) {
 
     var editedName by remember(pin) { mutableStateOf(pin.name) }
     var editedDescription by remember(pin) { mutableStateOf(pin.description ?: "") }
+    var editedColor by remember(pin) { mutableStateOf(pin.color) }
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -46,7 +47,7 @@ fun PinDetailsSheet(
                 )
                 IconButton(onClick = {
                     if (isEditing) {
-                        onSave(editedName, editedDescription)
+                        onSave(editedName, editedDescription, editedColor)
                     } else {
                         onToggleEdit()
                     }
@@ -59,7 +60,7 @@ fun PinDetailsSheet(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             if (isEditing) {
                 OutlinedTextField(
@@ -75,11 +76,18 @@ fun PinDetailsSheet(
                     label = { Text("Description") },
                     modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(text = "Color", style = MaterialTheme.typography.labelLarge)
+                Spacer(modifier = Modifier.height(8.dp))
+                ColorPicker(
+                    selectedColor = editedColor,
+                    onColorSelected = { editedColor = it }
+                )
             } else {
                 if (pin.name.isNotBlank()) {
                     Text(
                         text = pin.name,
-                        style = MaterialTheme.typography.headlineSmall
+                        style = MaterialTheme.typography.headlineMedium
                     )
                 }
                 Text(

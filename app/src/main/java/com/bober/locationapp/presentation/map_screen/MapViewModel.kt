@@ -113,10 +113,14 @@ class MapViewModel @Inject constructor(
         }
     }
 
-    fun updatePin(name: String, description: String?) {
+    fun updatePin(name: String, description: String?, color: Long) {
 
         val currentPin = _state.value.pin ?: return
-        val updatedPin = currentPin.copy(name = name.ifBlank { "Unnamed Point" }, description = description)
+        val updatedPin = currentPin.copy(
+            name = name.ifBlank { "Unnamed Point" },
+            description = description,
+            color = color
+        )
 
         viewModelScope.launch {
             repository.insertPin(updatedPin)
