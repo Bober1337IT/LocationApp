@@ -1,4 +1,4 @@
-package com.bober.locationapp.presentation.location_screen.map_screen
+package com.bober.locationapp.presentation.map_screen
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -6,21 +6,56 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bober.locationapp.domain.model.Pin
 import com.bober.locationapp.domain.repository.PinRepository
+import com.bober.locationapp.domain.repository.UserLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val repository: PinRepository
+    private val repository: PinRepository,
+    private val userLocationRepository: UserLocationRepository,
 ) : ViewModel() {
 
     private val _state = mutableStateOf(MapState())
     val state: State<MapState> = _state
 
+    private var trackingJob: Job? = null
+
     init {
         observePins()
+    }
+
+    fun startTracking() {
+        trackingJob = viewModelScope.launch {
+            _state.value = _state.value.copy(isLoading = true)
+            
+            userLocationRepository.observeLocationUpdates().collectLatest { coordinate ->
+                if (coordinate != null) {
+                    _state.value = _state.value.copy(
+                        location = coordinate,
+                        isLoading = false,
+                        error = null
+                    )
+                } else {
+                    _state.value = _state.value.copy(
+                        isLoading = false,
+                        error = "GPS is off or no permissions."
+                    )
+                }
+            }
+        }
+    }
+    fun stopTracking() {
+        trackingJob?.cancel()
+        _state.value = _state.value.copy(isLoading = false)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopTracking()
     }
 
     private fun observePins() {

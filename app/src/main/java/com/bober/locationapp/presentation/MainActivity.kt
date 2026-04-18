@@ -5,7 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
-import com.bober.locationapp.presentation.location_screen.LocationScreen
+import com.bober.locationapp.presentation.map_screen.MapScreen
 import com.bober.locationapp.presentation.ui.theme.LocationAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             LocationAppTheme {
                 Surface {
-                    LocationScreen()
+                    MapScreen()
                 }
             }
         }

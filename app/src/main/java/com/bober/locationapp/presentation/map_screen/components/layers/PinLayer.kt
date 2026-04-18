@@ -1,4 +1,4 @@
-package com.bober.locationapp.presentation.location_screen.map_screen.components.layers
+package com.bober.locationapp.presentation.map_screen.components.layers
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color

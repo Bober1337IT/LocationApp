@@ -1,5 +1,8 @@
-package com.bober.locationapp.presentation.location_screen.map_screen
+package com.bober.locationapp.presentation.map_screen
 
+import android.Manifest
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -11,6 +14,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
@@ -19,9 +23,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.bober.locationapp.domain.model.GeoCoordinate
-import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.UserLocationLayer
-import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.PinLayer
+import com.bober.locationapp.presentation.map_screen.components.layers.UserLocationLayer
+import com.bober.locationapp.presentation.map_screen.components.layers.PinLayer
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -35,15 +41,46 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun MapScreen(
-    location: GeoCoordinate?,
     viewModel: MapViewModel = hiltViewModel()
 ) {
 
     val state by viewModel.state
 
-    // Current user position from the location object
-    val userPosition = remember(location) {
-        location?.let { Position(it.longitude, it.latitude) } ?: Position(0.0, 0.0)
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+        ) {
+            viewModel.startTracking()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
+
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> viewModel.startTracking()
+                Lifecycle.Event.ON_PAUSE -> viewModel.stopTracking()
+                else -> Unit
+            }
+        }
+        lifecycle.addObserver(observer)
+        onDispose { lifecycle.removeObserver(observer) }
+    }
+
+    val userPosition = remember(state.location) {
+        state.location?.let { Position(it.longitude, it.latitude) } ?: Position(0.0, 0.0)
     }
 
     // State for tracking if camera is locked to user
@@ -59,7 +96,7 @@ fun MapScreen(
 
     // Effect to handle "Fixed Camera" logic (animates when location changes)
     LaunchedEffect(userPosition, fixedCamera) {
-        if (fixedCamera && location != null) {
+        if (fixedCamera && state.location != null) {
             isProgrammaticMovement = true
             cameraState.animateTo(
                 finalPosition = CameraPosition(target = userPosition, zoom = 15.0),
@@ -113,7 +150,7 @@ fun MapScreen(
                     ClickResult.Pass
                 },
             ) {
-                location?.let {
+                state.location?.let {
                     UserLocationLayer(
                         userPosition = userPosition
                     )

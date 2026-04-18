@@ -1,10 +1,10 @@
-package com.bober.locationapp.presentation.location_screen.map_screen.components.layers
+package com.bober.locationapp.presentation.map_screen.components.layers
 
 import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.bober.locationapp.R
-import com.bober.locationapp.presentation.location_screen.map_screen.components.rememberDeviceRotation
+import com.bober.locationapp.presentation.map_screen.components.rememberDeviceRotation
 import kotlinx.serialization.json.JsonObject
 import org.maplibre.compose.expressions.dsl.image
 import org.maplibre.compose.expressions.dsl.const
