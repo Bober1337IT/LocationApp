@@ -10,7 +10,7 @@ interface PinRepository {
 
     suspend fun getPinDetailsById(id: Long): Pin?
 
-    suspend fun insertPin(pin: Pin)
+    suspend fun insertPin(pin: Pin): Long
 
     suspend fun deletePin(pin: Pin)
 

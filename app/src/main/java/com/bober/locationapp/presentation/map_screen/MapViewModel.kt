@@ -2,6 +2,7 @@ package com.bober.locationapp.presentation.map_screen
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.toInt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bober.locationapp.domain.model.Pin
@@ -78,14 +79,18 @@ class MapViewModel @Inject constructor(
                 repository.deletePinById(existingPin.id)
             } else {
                 val newPin = Pin(
-                    name = "New Point",
+                    name = "",
                     city = userLocationRepository.resolveCityName(latitude, longitude) ?: "Unknown",
                     description = null,
                     latitude = latitude,
                     longitude = longitude,
                     createdAt = System.currentTimeMillis(),
                 )
-                repository.insertPin(newPin)
+                val generatedId = repository.insertPin(newPin)
+                _state.value = _state.value.copy(
+                    pin = newPin.copy(id = generatedId),
+                    isEditingPin = true
+                )
             }
         }
     }
@@ -101,12 +106,28 @@ class MapViewModel @Inject constructor(
                 val fullPin = repository.getPinDetailsById(existingPinMarker.id)
                 _state.value = _state.value.copy(pin = fullPin)
             } else {
-                _state.value = _state.value.copy(pin = null)
+                _state.value = _state.value.copy(pin = null, isEditingPin = false)
             }
         }
     }
 
+    fun updatePin(name: String, description: String?) {
+
+        val currentPin = _state.value.pin ?: return
+        val updatedPin = currentPin.copy(name = name.ifBlank { "Unnamed Point" }, description = description)
+
+        viewModelScope.launch {
+            repository.insertPin(updatedPin)
+            _state.value = _state.value.copy(pin = updatedPin, isEditingPin = false)
+        }
+    }
+
     fun dismissPinDetails() {
-        _state.value = _state.value.copy(pin = null)
+        _state.value = _state.value.copy(pin = null, isEditingPin = false)
+    }
+
+
+    fun toggleEditMode() {
+        _state.value = _state.value.copy(isEditingPin = !_state.value.isEditingPin)
     }
 }

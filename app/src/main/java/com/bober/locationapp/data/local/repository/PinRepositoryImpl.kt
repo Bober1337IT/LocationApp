@@ -22,8 +22,8 @@ class PinRepositoryImpl(
         return dao.getPinDetails(id)?.toPin()
     }
 
-    override suspend fun insertPin(pin: Pin) {
-        dao.insertPin(pin.toPinEntity())
+    override suspend fun insertPin(pin: Pin): Long {
+        return dao.insertPin(pin.toPinEntity())
     }
 
     override suspend fun deletePin(pin: Pin) {

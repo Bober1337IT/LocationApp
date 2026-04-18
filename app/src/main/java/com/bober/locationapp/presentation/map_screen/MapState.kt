@@ -9,5 +9,6 @@ data class MapState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val pins: List<PinMapMarker> = emptyList(),
-    val pin: Pin? = null
+    val pin: Pin? = null,
+    val isEditingPin: Boolean = false
 )
