@@ -18,7 +18,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.bober.locationapp.domain.model.GeoCoordinate
 import com.bober.locationapp.presentation.location_screen.map_screen.components.layers.UserLocationLayer
@@ -116,8 +115,7 @@ fun MapScreen(
             ) {
                 location?.let {
                     UserLocationLayer(
-                        userPosition = userPosition,
-                        metersPerDpAtTarget = cameraState.metersPerDpAtTarget
+                        userPosition = userPosition
                     )
                 }
 
