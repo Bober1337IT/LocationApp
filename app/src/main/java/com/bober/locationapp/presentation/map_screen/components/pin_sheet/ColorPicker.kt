@@ -1,4 +1,4 @@
-package com.bober.locationapp.presentation.map_screen.components
+package com.bober.locationapp.presentation.map_screen.components.pin_sheet
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable

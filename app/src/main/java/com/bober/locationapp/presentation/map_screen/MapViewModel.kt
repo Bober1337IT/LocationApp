@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bober.locationapp.domain.model.Pin
 import com.bober.locationapp.domain.repository.PinRepository
+import com.bober.locationapp.presentation.map_screen.components.pin_sheet.PinSheetMode
 import com.bober.locationapp.domain.repository.UserLocationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -91,7 +92,7 @@ class MapViewModel @Inject constructor(
                 val generatedId = repository.insertPin(newPin)
                 _state.value = _state.value.copy(
                     pin = newPin.copy(id = generatedId),
-                    isEditingPin = true
+                    pinSheetMode = PinSheetMode.EDITING,
                 )
             }
         }
@@ -106,9 +107,22 @@ class MapViewModel @Inject constructor(
             }
             if (existingPinMarker != null) {
                 val fullPin = repository.getPinDetailsById(existingPinMarker.id)
-                _state.value = _state.value.copy(pin = fullPin)
+                if (fullPin != null) {
+                    _state.value = _state.value.copy(
+                        pin = fullPin,
+                        pinSheetMode = PinSheetMode.DETAILS,
+                    )
+                } else {
+                    _state.value = _state.value.copy(
+                        pin = null,
+                        pinSheetMode = PinSheetMode.DETAILS,
+                    )
+                }
             } else {
-                _state.value = _state.value.copy(pin = null, isEditingPin = false)
+                _state.value = _state.value.copy(
+                    pin = null,
+                    pinSheetMode = PinSheetMode.DETAILS,
+                )
             }
         }
     }
@@ -124,16 +138,22 @@ class MapViewModel @Inject constructor(
 
         viewModelScope.launch {
             repository.insertPin(updatedPin)
-            _state.value = _state.value.copy(pin = updatedPin, isEditingPin = false)
+            _state.value = _state.value.copy(
+                pin = updatedPin,
+                pinSheetMode = PinSheetMode.DETAILS,
+            )
         }
     }
 
     fun dismissPinDetails() {
-        _state.value = _state.value.copy(pin = null, isEditingPin = false)
+        _state.value = _state.value.copy(
+            pin = null,
+            pinSheetMode = PinSheetMode.DETAILS,
+        )
     }
 
-
-    fun toggleEditMode() {
-        _state.value = _state.value.copy(isEditingPin = !_state.value.isEditingPin)
+    fun setPinSheetMode(mode: PinSheetMode) {
+        if (_state.value.pin == null) return
+        _state.value = _state.value.copy(pinSheetMode = mode)
     }
 }

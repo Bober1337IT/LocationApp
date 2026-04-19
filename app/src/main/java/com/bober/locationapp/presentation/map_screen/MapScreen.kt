@@ -22,7 +22,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -36,7 +35,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.bober.locationapp.presentation.map_screen.components.MapInfoWindow
-import com.bober.locationapp.presentation.map_screen.components.PinDetailsSheet
+import com.bober.locationapp.presentation.map_screen.components.pin_sheet.PinDetailsSheet
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.map.MapOptions
@@ -148,13 +147,13 @@ fun MapScreen(
             state.pin?.let { currentPin ->
                 PinDetailsSheet(
                     pin = currentPin,
-                    isEditing = state.isEditingPin,
+                    sheetMode = state.pinSheetMode,
                     sheetState = sheetState,
                     onDismissRequest = { viewModel.dismissPinDetails() },
-                    onToggleEdit = { viewModel.toggleEditMode() },
+                    onSheetModeChange = { viewModel.setPinSheetMode(it) },
                     onSave = { name, description, color ->
                         viewModel.updatePin(name, description, color)
-                    }
+                    },
                 )
             }
             Box(
