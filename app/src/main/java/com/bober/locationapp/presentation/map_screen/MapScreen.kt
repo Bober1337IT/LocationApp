@@ -4,25 +4,16 @@ import android.Manifest
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -31,20 +22,20 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toColorLong
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.bober.locationapp.presentation.map_screen.components.layers.UserLocationLayer
 import com.bober.locationapp.presentation.map_screen.components.layers.PinLayer
+import com.bober.locationapp.presentation.map_screen.components.layers.UserLocationLayer
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.bober.locationapp.presentation.map_screen.components.MapInfoWindow
 import com.bober.locationapp.presentation.map_screen.components.PinDetailsSheet
 import org.maplibre.compose.camera.CameraPosition
 import org.maplibre.compose.camera.rememberCameraState
@@ -166,44 +157,60 @@ fun MapScreen(
                     }
                 )
             }
-            MaplibreMap(
+            Box(
                 modifier = Modifier
                     .padding(paddingValues)
-                    .fillMaxSize(),
-
-                baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
-                cameraState = cameraState,
-                styleState = rememberStyleState(),
-                options = MapOptions(
-                    ornamentOptions = OrnamentOptions(
-                        isLogoEnabled = false,
-                        isAttributionEnabled = false,
-                        isScaleBarEnabled = false
-                    ),
-                ),
-                onMapLongClick = { position, _ ->
-                    viewModel.addRemovePin(position.latitude, position.longitude)
-                    ClickResult.Pass
-                },
-                onMapClick = { position, _ ->
-                    viewModel.showPinDetails(position.latitude, position.longitude)
-                    ClickResult.Pass
-                }
+                    .fillMaxSize()
             ) {
-                state.location?.let {
-                    UserLocationLayer(
-                        userPosition = userPosition
-                    )
+                MaplibreMap(
+                    modifier = Modifier.fillMaxSize(),
+                    baseStyle = BaseStyle.Uri("https://tiles.openfreemap.org/styles/liberty"),
+                    cameraState = cameraState,
+                    styleState = rememberStyleState(),
+                    options = MapOptions(
+                        ornamentOptions = OrnamentOptions(
+                            isLogoEnabled = false,
+                            isAttributionEnabled = false,
+                            isScaleBarEnabled = false
+                        ),
+                    ),
+                    onMapLongClick = { position, _ ->
+                        viewModel.addRemovePin(position.latitude, position.longitude)
+                        ClickResult.Pass
+                    },
+                    onMapClick = { position, _ ->
+                        viewModel.showPinDetails(position.latitude, position.longitude)
+                        ClickResult.Pass
+                    }
+                ) {
+                    state.location?.let {
+                        UserLocationLayer(userPosition = userPosition)
+                    }
+                    state.pins.forEach { pin ->
+                        key(pin.id) {
+                            PinLayer(
+                                id = pin.id.toString(),
+                                pinPosition = Position(pin.longitude, pin.latitude),
+                                color = pin.color,
+                                zoom = cameraState.position.zoom,
+                            )
+                        }
+                    }
                 }
-
-                state.pins.forEach { pin ->
-                    key(pin.id) {
-                        PinLayer(
-                            id = pin.id.toString(),
-                            pinPosition = Position(pin.longitude, pin.latitude),
-                            color = pin.color,
-                            zoom = cameraState.position.zoom
-                        )
+                if (cameraState.position.zoom > 14.0){
+                    state.pins.forEach { pin ->
+                        key(pin.id) {
+                            MapInfoWindow(
+                                cameraState = cameraState,
+                                targetPosition = Position(pin.longitude, pin.latitude),
+                                contentPadding = PaddingValues(4.dp)
+                            ) {
+                                Text(
+                                    text = pin.name.ifBlank { "Unnamed Point" },
+                                    color = Color.Black
+                                )
+                            }
+                        }
                     }
                 }
             }

@@ -22,6 +22,7 @@ fun PinEntity.toPin(): Pin {
 fun PinLocation.toPin(): PinMapMarker {
     return PinMapMarker(
         id = id,
+        name = name,
         color = color,
         latitude = latitude,
         longitude = longitude

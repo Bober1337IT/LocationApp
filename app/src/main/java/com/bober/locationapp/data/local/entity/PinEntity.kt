@@ -24,6 +24,7 @@ data class PinEntity(
 
 data class PinLocation(
     val id: Long,
+    val name: String,
     val color: Long,
     val latitude: Double,
     val longitude: Double

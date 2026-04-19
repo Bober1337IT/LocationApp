@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface PinDao {
 
-    @Query("SELECT id, color, latitude, longitude FROM pins")
+    @Query("SELECT id, name, color, latitude, longitude FROM pins")
     fun getAllPinLocations(): Flow<List<PinLocation>>
 
     @Query("SELECT * FROM pins WHERE id = :pinId")

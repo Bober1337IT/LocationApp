@@ -14,6 +14,7 @@ data class Pin(
 
 data class PinMapMarker(
     val id: Long,
+    val name: String,
     val color: Long,
     val latitude: Double,
     val longitude: Double

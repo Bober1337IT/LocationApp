@@ -20,7 +20,6 @@ fun PinLayer(id: String, pinPosition: Position, color: Long, zoom: Double) {
         zoom <= 7.0 -> 2.dp
         zoom >= 15.0 -> 8.dp
         else -> {
-            // currentSize = minSize + (progress * totalSizeRange)
             val progress = (zoom - 7.0) / (15.0 - 7.0)
             val sizeRange = 8.dp - 2.dp
             2.dp + (sizeRange * progress.toFloat())
